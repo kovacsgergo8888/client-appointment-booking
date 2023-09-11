@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('opening_hours', function (Blueprint $table) {
             $table->id();
             $table->date('from');
-            $table->date('to');
+            $table->date('to')->nullable();
             $table->time('from_time');
             $table->time('to_time');
             $table->enum('repeat', ['NO_REPEAT', 'WEEKLY', 'EVEN_WEEKS', 'ODD_WEEKS']);
-            $table->tinyInteger('day_of_week');
+            $table->integer('day_of_week')->nullable();
             $table->timestamps();
         });
     }
