@@ -1,0 +1,2 @@
+GET http://localhost/api/appointments?from=2000-01-01&to=2030-01-01
+Accept: application/json
