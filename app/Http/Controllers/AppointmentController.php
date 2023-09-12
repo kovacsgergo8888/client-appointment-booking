@@ -4,15 +4,28 @@ namespace App\Http\Controllers;
 
 use App\Models\Appointment;
 use Illuminate\Http\Request;
+use DateTime;
+use InvalidArgumentException;
 
 class AppointmentController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $from = $request->get('from');
+        $to = $request->get('to');
+
+        if ($from === null || $to === null) {
+            throw new InvalidArgumentException('from and to query strings are required');
+        }
+        $appointments = Appointment::where([
+            ['start', '>', $from],
+            ['end', '<=', $to],
+        ])->get();
+        return $appointments->toArray();
+
     }
 
     /**
