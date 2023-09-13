@@ -28,9 +28,9 @@ class AppointmentController extends Controller
     public function store(AppointmentRequest $request)
     {
         $appointment = new Appointment();
-        $appointment->client_name = $request->get('title');
-        $appointment->start = $request->get('start');
-        $appointment->end = $request->get('end');
+        $appointment->client_name = $request->get('clientName');
+        $appointment->start = $request->date('start');
+        $appointment->end = $request->date('end');
 
         $appointment->save();
 

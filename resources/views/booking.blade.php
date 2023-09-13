@@ -12,28 +12,47 @@
     <div id="calendar"></div>
     <script>
 
-        const onEventsLoaded = data => data.map(event => ({
-            title: event.client_name,
-            start: event.start,
-            end: event.end
-        }))
 
-        const eventsLoader = async ({startStr, endStr}, onEventsLoaded) => {
-            const searchParams = new URLSearchParams({from: startStr, to: endStr})
-            const response = await fetch(`/api/appointments?${searchParams.toString()}`)
-            const data = await response.json()
-            console.log(data)
-            return data.map(event => ({
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const onEventsLoaded = data => data.map(event => ({
                 title: event.client_name,
                 start: event.start,
                 end: event.end
             }))
-        }
 
-        document.addEventListener('DOMContentLoaded', function() {
+            const eventsLoader = async ({startStr, endStr}, onEventsLoaded) => {
+                const searchParams = new URLSearchParams({from: startStr, to: endStr})
+                const response = await fetch(`/api/appointments?${searchParams.toString()}`)
+                const data = await response.json()
+                return data.map(event => ({
+                    title: event.client_name,
+                    start: event.start,
+                    end: event.end
+                }))
+            }
+
+            const addAppointment = async (selectedEvent) => {
+                const clientName = window.prompt()
+                const {start, end} = selectedEvent
+                await fetch('/api/appointments', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        clientName,
+                        start,
+                        end
+                    })
+                })
+                await calendar.refetchEvents()
+            }
           var calendarEl = document.getElementById('calendar');
           var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'timeGridWeek',
+            timeZone: 'Europe/Budapest',
             headerToolbar: {
                 left: 'prev,next',
                 center: 'title',
@@ -43,7 +62,7 @@
             slotMaxTime: '20:00:00',
             locale: 'hu',
             selectable: true,
-            select: (data) => { console.log(data) },
+            select: addAppointment,
             events: eventsLoader
           });
           calendar.render();

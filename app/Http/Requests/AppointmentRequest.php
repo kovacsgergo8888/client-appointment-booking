@@ -22,7 +22,7 @@ class AppointmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|max:255',
+            'clientName' => 'required|max:255',
             'start' => 'required|date',
             'end' => 'required|date',
         ];
