@@ -6,8 +6,6 @@ use App\Http\Requests\AppointmentCollectionRequest;
 use App\Http\Requests\AppointmentRequest;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
-use DateTime;
-use InvalidArgumentException;
 
 class AppointmentController extends Controller
 {
@@ -27,9 +25,16 @@ class AppointmentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(AppointmentRequest $request)
     {
-        //
+        $appointment = new Appointment();
+        $appointment->client_name = $request->get('title');
+        $appointment->start = $request->get('start');
+        $appointment->end = $request->get('end');
+
+        $appointment->save();
+
+        return $appointment->toArray();
     }
 
     /**
