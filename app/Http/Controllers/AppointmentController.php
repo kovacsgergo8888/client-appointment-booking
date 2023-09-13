@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AppointmentCollectionRequest;
+use App\Http\Requests\AppointmentRequest;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
 use DateTime;
@@ -12,17 +14,11 @@ class AppointmentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(AppointmentCollectionRequest $request)
     {
-        $from = $request->get('from');
-        $to = $request->get('to');
-
-        if ($from === null || $to === null) {
-            throw new InvalidArgumentException('from and to query strings are required');
-        }
         $appointments = Appointment::where([
-            ['start', '>', $from],
-            ['end', '<=', $to],
+            ['start', '>', $request->get('from')],
+            ['end', '<=', $request->get('to')],
         ])->get();
         return $appointments->toArray();
 
@@ -32,14 +28,6 @@ class AppointmentController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Appointment $appointment)
     {
         //
     }
