@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Client booking</title>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 </head>
 <body>
 
@@ -35,19 +36,31 @@
             const addAppointment = async (selectedEvent) => {
                 const clientName = window.prompt()
                 const {start, end} = selectedEvent
-                await fetch('/api/appointments', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        clientName,
-                        start,
-                        end
+                const notification = Toastify({duration: 5000, position: 'center'})
+                try {
+                    const response = await fetch('/api/appointments', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            clientName,
+                            start,
+                            end
+                        })
                     })
-                })
-                await calendar.refetchEvents()
+                    const responseData = await response.json()
+                    if (!response.ok) {
+                        throw new Error(responseData.message ?? 'Ismeretlen hiba!');
+                    }
+                    notification.options.text = 'Sikeres hozzaadas'
+                } catch (error) {
+                    notification.options.text = error.message
+                } finally {
+                    await calendar.refetchEvents()
+                    notification.showToast()
+                }
             }
           var calendarEl = document.getElementById('calendar');
           var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -56,7 +69,7 @@
             headerToolbar: {
                 left: 'prev,next',
                 center: 'title',
-                right: 'today timeGridWeek,timeGridDay'
+                right: 'today dayGridMonth,timeGridWeek,timeGridDay'
             },
             slotMinTime: '06:00:00',
             slotMaxTime: '20:00:00',
@@ -69,5 +82,6 @@
         });
 
       </script>
+      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 </body>
 </html>

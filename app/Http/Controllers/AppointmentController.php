@@ -7,6 +7,7 @@ use App\Http\Requests\AppointmentCollectionRequest;
 use App\Http\Requests\AppointmentRequest;
 use App\Models\Appointment;
 use App\Models\OpeningHour;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -42,7 +43,7 @@ class AppointmentController extends Controller
                 return $appointment->toArray();
             }
         }
-        return 'error';
+        return new JsonResponse(['message' => 'Sikertelen hozzáadás'], 422);
     }
 
     /**
