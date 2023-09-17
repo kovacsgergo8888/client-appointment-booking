@@ -6,6 +6,7 @@ use App\Http\Requests\AppointmentCollectionRequest;
 use App\Http\Requests\AppointmentRequest;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class AppointmentController extends Controller
 {
@@ -18,6 +19,7 @@ class AppointmentController extends Controller
             ['start', '>', $request->get('from')],
             ['end', '<=', $request->get('to')],
         ])->get();
+        var_dump($appointments[0]);die;
         return $appointments->toArray();
 
     }
@@ -31,6 +33,8 @@ class AppointmentController extends Controller
         $appointment->client_name = $request->get('clientName');
         $appointment->start = $request->date('start');
         $appointment->end = $request->date('end');
+
+        // $validator = Validator::make($appointment)
 
         $appointment->save();
 
