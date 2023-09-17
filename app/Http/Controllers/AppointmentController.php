@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\ClientBooking\AppointmentOpeningHourValidator;
 use App\Http\Requests\AppointmentCollectionRequest;
 use App\Http\Requests\AppointmentRequest;
 use App\Models\Appointment;
+use App\Models\OpeningHour;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -19,9 +21,7 @@ class AppointmentController extends Controller
             ['start', '>', $request->get('from')],
             ['end', '<=', $request->get('to')],
         ])->get();
-        var_dump($appointments[0]);die;
         return $appointments->toArray();
-
     }
 
     /**
@@ -34,11 +34,15 @@ class AppointmentController extends Controller
         $appointment->start = $request->date('start');
         $appointment->end = $request->date('end');
 
-        // $validator = Validator::make($appointment)
-
-        $appointment->save();
-
-        return $appointment->toArray();
+        $openingHours = OpeningHour::all();
+        $appointmentValidator = new AppointmentOpeningHourValidator();
+        foreach ($openingHours as $openinghHour) {
+            if ($appointmentValidator->validate($appointment, $openinghHour)) {
+                $appointment->save();
+                return $appointment->toArray();
+            }
+        }
+        return 'error';
     }
 
     /**

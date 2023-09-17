@@ -9,7 +9,7 @@ use DateTimeImmutable;
 class AppointmentOpeningHourValidator
 {
     private DateTimeImmutable $openingHourFrom;
-    private ?DateTimeImmutable $openingHourTo;
+    private DateTimeImmutable $openingHourTo;
     private DateTimeImmutable $appointmentStart;
     private DateTimeImmutable $appointmentEnd;
 
@@ -22,22 +22,31 @@ class AppointmentOpeningHourValidator
         $this->appointmentEnd = new DateTimeImmutable($appointment->end);
 
         $this->openingHourFrom = new DateTimeImmutable("{$openingHour->from} {$openingHour->from_time}");
-        $this->openingHourTo = $openingHour->to !== null
-            ? new DateTimeImmutable("{$openingHour->to} {$openingHour->to_time}")
-            : new DateTimeImmutable("{$this->appointmentEnd->format('Y-m-d')} {$openingHour->to_time}");
+        $this->setOpeningHourTo($appointment, $openingHour);
 
         $this->repeat = Repeat::from($openingHour->repeat);
         $this->dayOfWeek = $openingHour->day_of_week;
 
         return match ($this->repeat) {
-            Repeat::NO_REPEAT => $this->appointmentInOpeningHour(),
+            Repeat::NO_REPEAT => $this->validateNoRepeat(),
             Repeat::WEEKLY => $this->validateWeekly(),
             Repeat::ODD_WEEKS, Repeat::EVEN_WEEKS => $this->validateEvenOddWeekly(),
             default => false
         };
     }
 
-    private function appointmentInOpeningHour(): bool
+    private function setOpeningHourTo(Appointment $appointment, OpeningHour $openingHour): void
+    {
+        if ($openingHour->repeat === Repeat::NO_REPEAT->value) {
+            $this->openingHourTo = new DateTimeImmutable("{$openingHour->from} {$openingHour->to_time}");
+            return;
+        }
+        $this->openingHourTo = $openingHour->to !== null
+            ? new DateTimeImmutable("{$openingHour->to} {$openingHour->to_time}")
+            : new DateTimeImmutable("{$this->appointmentEnd->format('Y-m-d')} {$openingHour->to_time}");
+    }
+
+    private function validateNoRepeat(): bool
     {
         return
             $this->appointmentStart >= $this->openingHourFrom
