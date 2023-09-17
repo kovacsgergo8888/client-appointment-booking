@@ -47,7 +47,7 @@ class OpeningHoursSeeder extends Seeder
             'to' => '2023-11-30',
             'from_time' => '16:00',
             'to_time' => '20:00',
-            'repeat' => Repeat::NO_REPEAT->value,
+            'repeat' => Repeat::WEEKLY->value,
             'day_of_week' => 4,
         ],
     ];

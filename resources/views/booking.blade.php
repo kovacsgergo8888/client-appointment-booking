@@ -12,9 +12,6 @@
 
     <div id="calendar"></div>
     <script>
-
-
-
         document.addEventListener('DOMContentLoaded', function() {
             const onEventsLoaded = data => data.map(event => ({
                 title: event.client_name,
@@ -25,12 +22,7 @@
             const eventsLoader = async ({startStr, endStr}, onEventsLoaded) => {
                 const searchParams = new URLSearchParams({from: startStr, to: endStr})
                 const response = await fetch(`/api/appointments?${searchParams.toString()}`)
-                const data = await response.json()
-                return data.map(event => ({
-                    title: event.client_name,
-                    start: event.start,
-                    end: event.end
-                }))
+                return await response.json()
             }
 
             const addAppointment = async (selectedEvent) => {
@@ -72,8 +64,9 @@
                 right: 'today dayGridMonth,timeGridWeek,timeGridDay'
             },
             slotMinTime: '06:00:00',
-            slotMaxTime: '20:00:00',
+            slotMaxTime: '21:00:00',
             locale: 'hu',
+            firstDay: 1,
             selectable: true,
             select: addAppointment,
             events: eventsLoader
