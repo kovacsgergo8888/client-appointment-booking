@@ -35,14 +35,11 @@ class AppointmentController extends Controller
         $appointment->start = $request->date('start');
         $appointment->end = $request->date('end');
 
-        $openingHours = OpeningHour::all();
-        $appointmentValidator = new AppointmentOpeningHourValidator();
-        foreach ($openingHours as $openinghHour) {
-            if ($appointmentValidator->validate($appointment, $openinghHour)) {
-                $appointment->save();
-                return $appointment->toArray();
-            }
+        if ($appointment->ableToBook()) {
+            $appointment->save();
+            return $appointment->toArray();
         }
+
         return new JsonResponse(['message' => 'Sikertelen hozzáadás'], 422);
     }
 

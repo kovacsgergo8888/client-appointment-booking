@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\ClientBooking\AppointmentOpeningHourValidator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use DateTime;
@@ -18,4 +19,38 @@ class Appointment extends Model
 
     protected $table = 'appointments';
     protected $primaryKey = 'appointment_id';
+
+    public function ableToBook(): bool
+    {
+        return
+            $this->validateToOpeningHours()
+            && $this->unBooked();
+    }
+
+    private function validateToOpeningHours(): bool
+    {
+        $openingHours = OpeningHour::all();
+        $appointmentValidator = new AppointmentOpeningHourValidator();
+        foreach ($openingHours as $openinghHour) {
+            if ($appointmentValidator->validate($this, $openinghHour)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function unBooked(): bool
+    {
+        $appointments = Appointment::where([
+            ['start', '>=', $this->start],
+            ['start', '<=', $this->start]
+        ])
+        ->orWhere([
+            ['end', '>=', $this->end],
+            ['end', '<=', $this->end],
+        ])
+        ->count();
+
+        return $appointments === 0;
+    }
 }
